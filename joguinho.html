@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" height="1000" width="1000"></canvas>
+    <script>
+var bird = {
+    altura:25,largura:25,vx:0,vy:0,x:300,y:200,pode:true
+
+}
+var tela = {
+    altura:1000,largura:1000,jogo:true
+}
+
+var cano = {
+    teto:[200,100] ,chao:[350,250],x:[500,1000],vx : -5,largura:50
+
+}
+    var gravidade = 0.5;
+    addEventListener("keydown",function(a){
+        if (a.keyCode == 87 && bird.pode == true){
+            bird.vy = -10;
+            bird.pode = false;
+        }
+    })
+
+    addEventListener("keyup",function(a){
+        if (a.keyCode == 87){ //soltar 'w' para pular
+            bird.pode = true
+        }
+
+    })
+    function cair(){
+        bird.y += bird.vy;
+        bird.vy+=gravidade;
+    }
+
+    function parede(){//detecta a colisão do passarinho com oa obstáculos
+        cont = 0;
+        while(cont<2){
+            ctx.fillRect(cano.x[cont],0,cano.largura,cano.teto[cont]);
+            ctx.fillRect(cano.x[cont],cano.chao[cont],cano.largura,tela.altura - cano.chao[cont]);    
+            cano.x[cont]+=cano.vx;
+            if(cano.x[cont]<0){
+                cano.x[cont] = tela.largura;
+                cano.teto[cont] = Math.floor(Math.random() * 450) + 20;
+                cano.chao[cont] = cano.teto[cont] + 150;
+            }
+            if((bird.x>cano.x[cont] && bird.x<cano.x[cont]+cano.largura)&&(bird.y>cano.chao[cont]||bird.y<cano.teto[cont])){
+
+                console.log("funcionou");
+                ctx.font = "80px Arial";
+                ctx.fillStyle = "#FF0000";
+                ctx.fillText("Perdeu", 250, 450);
+                tela.jogo = false;
+            }
+
+            cont++;
+        }
+
+    }
+
+    var canvas = window.document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    game();
+
+    function game(){  //gameloop
+        ctx.clearRect(0,0,tela.largura,tela.altura);
+        ctx.fillRect(bird.x,bird.y,bird.altura,bird.largura);
+        parede();
+        cair();
+
+
+        if(tela.jogo){//verifica se o jogador perdeu antes de continuar o loop
+        requestAnimationFrame(game);
+        }
+    }
+    </script>
+
+
+</body>
+</html>
